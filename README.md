@@ -1,0 +1,2 @@
+# schulzfunctions
+Various Helper Functions
