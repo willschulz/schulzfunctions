@@ -1,0 +1,73 @@
+---
+title: "batcher_dev"
+author: "Will Schulz"
+date: "1/25/2022"
+output: html_document
+---
+
+```{r}
+apply
+
+```
+
+
+```{r}
+
+match.fun
+```
+
+
+```{r}
+batcher <- function (X, FUN, batch_size, ...) {
+  FUN <- match.fun(FUN)
+  nBatches <- length(X)/batch_size
+  nWholeBatches <- floor(nBatches)
+  if (nWholeBatches < 1) {
+      return(forceAndCall(1,FUN, X))
+  }
+  else {
+      p_list <- list()
+      for (i in 1:nWholeBatches) {
+          if (nWholeBatches > 1) {
+              pb <- txtProgressBar(min = 1, max = nWholeBatches, 
+                style = 3)
+              setTxtProgressBar(pb, i)
+          }
+          p_list[[i]] <- forceAndCall(1, FUN, X[((i - 
+              1) * batch_size + 1):((i) * batch_size)])
+      }
+      message("Doing final batch...")
+      if (nBatches != nWholeBatches) {
+          p_list[[i + 1]] <- forceAndCall(1, FUN, X[((i) * 
+              batch_size + 1):length(X)])
+      }
+      return(p_list)
+  }
+}
+
+```
+
+
+```{r}
+batcher(X = runif(1000), FUN = mean, batch_size = 10)
+```
+
+
+```{r}
+match.call(get, call("get", "abc", i = FALSE, p = 3))
+
+```
+
+
+```{r}
+
+
+```
+
+
+```{r}
+
+
+```
+
+

@@ -211,4 +211,41 @@ plotGradient <- function(input, left_color=c(0,0,1,.5), right_color=c(1,0,0,.5),
 }
 
 
+#' Batcher (for vectors)
+#'
+#' A function to batch another (simple) function that takes a vector.
+#' @param X Data to input
+#' @param FUN Function to apply
+#' @param batch_size Size of vatches
+#' @param ... Additional arguments to FUN (not yet implemented)
+#' @keywords efficiency
+#' @export
+#' @examples
+#' batcher()
 
+batcher <- function (X, FUN, batch_size, ...) {
+  FUN <- match.fun(FUN)
+  nBatches <- length(X)/batch_size
+  nWholeBatches <- floor(nBatches)
+  if (nWholeBatches < 1) {
+    return(forceAndCall(1,FUN, X))
+  }
+  else {
+    p_list <- list()
+    for (i in 1:nWholeBatches) {
+      if (nWholeBatches > 1) {
+        pb <- txtProgressBar(min = 1, max = nWholeBatches,
+                             style = 3)
+        setTxtProgressBar(pb, i)
+      }
+      p_list[[i]] <- forceAndCall(1, FUN, X[((i -
+                                                1) * batch_size + 1):((i) * batch_size)])
+    }
+    message("Doing final batch...")
+    if (nBatches != nWholeBatches) {
+      p_list[[i + 1]] <- forceAndCall(1, FUN, X[((i) *
+                                                   batch_size + 1):length(X)])
+    }
+    return(p_list)
+  }
+}
