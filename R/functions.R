@@ -249,3 +249,42 @@ batcher <- function (X, FUN, batch_size, ...) {
     return(p_list)
   }
 }
+
+#' Batcher (for arrays)
+#'
+#' A function to batch another (simple) function that takes an array.
+#' @param X Data to input
+#' @param FUN Function to apply
+#' @param batch_size Size of vatches
+#' @param ... Additional arguments to FUN (not yet implemented)
+#' @keywords efficiency
+#' @export
+#' @examples
+#' batcher_array()
+
+batcher_array <- function (X, FUN, batch_size, ...) {
+  FUN <- match.fun(FUN)
+  nBatches <- nrow(X)/batch_size
+  nWholeBatches <- floor(nBatches)
+  if (nWholeBatches < 1) {
+    return(forceAndCall(1,FUN, X))
+  }
+  else {
+    p_list <- list()
+    for (i in 1:nWholeBatches) {
+      if (nWholeBatches > 1) {
+        pb <- txtProgressBar(min = 1, max = nWholeBatches,
+                             style = 3)
+        setTxtProgressBar(pb, i)
+      }
+      p_list[[i]] <- forceAndCall(1, FUN, X[((i -
+                                                1) * batch_size + 1):((i) * batch_size),])
+    }
+    message("Doing final batch...")
+    if (nBatches != nWholeBatches) {
+      p_list[[i + 1]] <- forceAndCall(1, FUN, X[((i) *
+                                                   batch_size + 1):nrow(X),])
+    }
+    return(p_list)
+  }
+}
